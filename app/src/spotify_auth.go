@@ -34,7 +34,7 @@ func loadEnv() {
 	 */
 	err := godotenv.Load("../env/.env")
 	if err != nil {
-		log.Fatalf("Error loading .enf file: %v", err)
+		log.Fatalf("Error loading .env file: %v", err)
 	}
 }
 
