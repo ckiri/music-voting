@@ -59,7 +59,7 @@ func SearchForSong(searchString string) Song { ... }
 
 ### Bugs / TODOs:
 - No error handling whatsoever -> unexpected behaviour when a API call inevitably fails
-- Could siplify the function parameters to always accept Song structs and handle value extraction in code
+- Could simplify the function parameters to always accept Song structs and handle value extraction in code
 - More information could be collected, like album, other artists ...
 
 ## Recommending functions (recommender.go)
