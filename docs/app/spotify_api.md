@@ -59,11 +59,15 @@ func SearchForSong(searchString string) Song { ... }
 
 ### Bugs / TODOs:
 - No error handling whatsoever -> unexpected behaviour when a API call inevitably fails
+<<<<<<< HEAD
+=======
+- Could simplify the function parameters to always accept Song structs and handle value extraction in code
+>>>>>>> refs/remotes/origin/spotify_api_implement
 - More information could be collected, like album, other artists ...
 
 ## Recommending functions (recommender.go)
 
-In order to handle the logic of recommending a song based on the actual playing song the module ```recommender.go``` is written. Due to spotify depricating the ```/recomendations``` [:'(](https://developer.spotify.com/documentation/web-api/reference/get-recommendations) a workaround is made using the information of the playing song and the [Last.fm API](https://www.last.fm/api).
+In order to handle the logic of recommending a song based on the actual playing song the module ```recommender.go``` is written. Due to Spotify deprecating the ```/recommendations``` [:'(](https://developer.spotify.com/documentation/web-api/reference/get-recommendations) a workaround is made using the information of the playing song and the [Last.fm API](https://www.last.fm/api).
 
 The following function is available to call:
 
@@ -84,7 +88,7 @@ Alternatively the following ✨**AI Powered**✨ function is made available:
 func AIRecommendSongs(song Song, amount int) RecommendedSongs { ... }
 ```
 
-Same logic, just worse (performace / latency / hallucinations). You also need a local OLLAMA Instance running as well as a comprehensive model that does not hallucinate songs into existance.
+Same logic, just worse (performance / latency / hallucinations). You also need a local OLLAMA Instance running as well as a comprehensive model that does not hallucinate songs into existence.
 
 ### Bugs / TODOs:
 - No error handling whatsoever -> unexpected behaviour when a API call inevitably fails
