@@ -85,7 +85,7 @@ Alternatively the following ✨**AI Powered**✨ function is made available:
 func AIRecommendSongs(song Song) RecommendedSongs { ... }
 ```
 
-Same logic, just worse (performace / latency / hallucinations). You also need a local OLLAMA Instance running as well as a comprehensive model that does not hallucinate songs into existance.
+Same logic, just worse (performance / latency / hallucinations). You also need a local OLLAMA Instance running as well as a comprehensive model that does not hallucinate songs into existence.
 
 ### Bugs / TODOs:
 - No error handling whatsoever -> unexpected behaviour when a API call inevitably fails
