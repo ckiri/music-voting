@@ -59,10 +59,7 @@ func SearchForSong(searchString string) Song { ... }
 
 ### Bugs / TODOs:
 - No error handling whatsoever -> unexpected behaviour when a API call inevitably fails
-<<<<<<< HEAD
-=======
 - Could simplify the function parameters to always accept Song structs and handle value extraction in code
->>>>>>> refs/remotes/origin/spotify_api_implement
 - More information could be collected, like album, other artists ...
 
 ## Recommending functions (recommender.go)
