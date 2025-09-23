@@ -64,7 +64,7 @@ func SearchForSong(searchString string) Song { ... }
 
 ## Recommending functions (recommender.go)
 
-In order to handle the logic of recommending a song based on the actual playing song the module ```recommender.go``` is written. Due to spotify depricating the ```/recomendations``` [:'(](https://developer.spotify.com/documentation/web-api/reference/get-recommendations) a workaround is made using the information of the playing song and the [Last.fm API](https://www.last.fm/api).
+In order to handle the logic of recommending a song based on the actual playing song the module ```recommender.go``` is written. Due to Spotify deprecating the ```/recommendations``` [:'(](https://developer.spotify.com/documentation/web-api/reference/get-recommendations) a workaround is made using the information of the playing song and the [Last.fm API](https://www.last.fm/api).
 
 The following function is available to call:
 
