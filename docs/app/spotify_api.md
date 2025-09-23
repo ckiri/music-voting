@@ -48,7 +48,7 @@ type Song struct {
 ```
 Also the following (self-explanatory) functions can be called:
 ```go
-func AddSongToQueue(songURI string) { ... }
+func AddSongToQueue(song Song) { ... }
 ```
 ```go
 func SkipCurrentSong() { ... }
@@ -59,7 +59,6 @@ func SearchForSong(searchString string) Song { ... }
 
 ### Bugs / TODOs:
 - No error handling whatsoever -> unexpected behaviour when a API call inevitably fails
-- Could siplify the function parameters to always accept Song structs and handle value extraction in code
 - More information could be collected, like album, other artists ...
 
 ## Recommending functions (recommender.go)
@@ -69,7 +68,7 @@ In order to handle the logic of recommending a song based on the actual playing 
 The following function is available to call:
 
 ```go
-func RecommendSongs(song Song) RecommendedSongs { ...}
+func RecommendSongs(song Song, amount int) RecommendedSongs { ...}
 ```
 
 which returns a struct of possible songs to play (5 in total):
@@ -82,14 +81,14 @@ type RecommendedSongs struct {
 Alternatively the following ✨**AI Powered**✨ function is made available:
 
 ```go
-func AIRecommendSongs(song Song) RecommendedSongs { ... }
+func AIRecommendSongs(song Song, amount int) RecommendedSongs { ... }
 ```
 
 Same logic, just worse (performace / latency / hallucinations). You also need a local OLLAMA Instance running as well as a comprehensive model that does not hallucinate songs into existance.
 
 ### Bugs / TODOs:
 - No error handling whatsoever -> unexpected behaviour when a API call inevitably fails
-- More choices for caller (e.g. how many songs to recommend, how big of a token context ...)
+- More choices for caller (e.g. context size, proompting, genre limits etc.)
 
 ## Docs
 

@@ -2,7 +2,7 @@ package main
 
 import (
 	"fmt"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"net/url"
 
@@ -13,21 +13,24 @@ var (
 	token, err = ReadToken(TokenFile)
 )
 
-func makeRequest(targetURL string, requestType string,) string {
-	request, err := http.NewRequest(requestType, targetURL, nil); if err != nil {
+func makeRequest(targetURL string, requestType string) string {
+	request, err := http.NewRequest(requestType, targetURL, nil)
+	if err != nil {
 		fmt.Println("Failed creating a request:", err)
 		return ""
 	}
 	request.Header.Add("Authorization", "Bearer " + token.AccessToken)
 
 	client := &http.Client{}
-	response, err := client.Do(request); if err != nil {
+	response, err := client.Do(request)
+	if err != nil {
 		fmt.Println("Failed making request:", err)
 		return ""
 	}
 	defer response.Body.Close()
 
-	body, err := ioutil.ReadAll(response.Body); if err != nil {
+	body, err := io.ReadAll(response.Body)
+	if err != nil {
 		fmt.Println("Failed reading body:", err)
 		return ""
 	}
@@ -49,7 +52,7 @@ type Song struct {
 type PlaybackState struct {
 	song 			Song
 	playbackState 	string
-	progress 		int64 //leftover ms
+	progress 		int64
 }
 
 
@@ -78,8 +81,9 @@ func GetPlaybackState() PlaybackState {
 	return playbackState
 }
 
-func AddSongToQueue(songURI string) {
+func AddSongToQueue(song Song) {
 
+	songURI := song.uri
  	targetURL := fmt.Sprintf("https://api.spotify.com/v1/me/player/queue?uri=%s", songURI)
 	makeRequest(targetURL, "POST")
 }
@@ -93,7 +97,6 @@ func SearchForSong(searchString string) Song {
 
 	searchString = url.QueryEscape(searchString)
 	targetURL := fmt.Sprintf("https://api.spotify.com/v1/search?q=%s&type=track&limit=1", searchString)
-	fmt.Println("GET request to:", targetURL)
 	body := makeRequest(targetURL, "GET")
 
 	song := Song {
