@@ -9,36 +9,6 @@ import (
 	"github.com/tidwall/gjson"
 )
 
-var (
-	token, err = ReadToken(TokenFile)
-)
-
-func makeRequest(targetURL string, requestType string) string {
-	request, err := http.NewRequest(requestType, targetURL, nil)
-	if err != nil {
-		fmt.Println("Failed creating a request:", err)
-		return ""
-	}
-	request.Header.Add("Authorization", "Bearer " + token.AccessToken)
-
-	client := &http.Client{}
-	response, err := client.Do(request)
-	if err != nil {
-		fmt.Println("Failed making request:", err)
-		return ""
-	}
-	defer response.Body.Close()
-
-	body, err := io.ReadAll(response.Body)
-	if err != nil {
-		fmt.Println("Failed reading body:", err)
-		return ""
-	}
-
-	fmt.Println("Status:", response.Status)
-	return string(body)
-}
-
 
 type Song struct {
 	trackName	string
@@ -56,9 +26,39 @@ type PlaybackState struct {
 }
 
 
-func GetPlaybackState() PlaybackState {
+func makeRequest(targetURL string, requestType string) (string, error) {
 
-	body := makeRequest("https://api.spotify.com/v1/me/player", "GET")
+	token, err := ReadToken(TokenFile)
+
+	request, err := http.NewRequest(requestType, targetURL, nil)
+	if err != nil {
+		return "", fmt.Errorf("Failed creating a request: %s", err)
+	}
+	request.Header.Add("Authorization", "Bearer " + token.AccessToken)
+
+	client := &http.Client{}
+	response, err := client.Do(request)
+	if err != nil {
+		return "", fmt.Errorf("Failed making request: %s", err)
+	}
+	defer response.Body.Close()
+
+	body, err := io.ReadAll(response.Body)
+	if err != nil {
+		return "", fmt.Errorf("Failed reading body: %s", err)
+	}
+
+	fmt.Println("Status: ", response.Status)
+	return string(body), nil
+}
+
+
+func GetPlaybackState() (PlaybackState, error) {
+
+	body, err := makeRequest("https://api.spotify.com/v1/me/player", "GET")
+	if err != nil {
+		return PlaybackState{}, err
+	}
 
 	progressMs := gjson.Get(body, "progress_ms").Int()
 	durationMs := gjson.Get(body, "item.duration_ms").Int()
@@ -78,26 +78,43 @@ func GetPlaybackState() PlaybackState {
 		progress: 		timeLeftMs,
 	}
 
-	return playbackState
+	return playbackState, nil
 }
 
-func AddSongToQueue(song Song) {
+
+func AddSongToQueue(song Song) error {
 
 	songURI := song.uri
  	targetURL := fmt.Sprintf("https://api.spotify.com/v1/me/player/queue?uri=%s", songURI)
-	makeRequest(targetURL, "POST")
+	_, err := makeRequest(targetURL, "POST")
+
+	if err != nil {
+		return err
+	} else {
+		return nil
+	}
 }
 
-func SkipCurrentSong() {
 
-	makeRequest("https://api.spotify.com/v1/me/player/next", "POST")
+func SkipCurrentSong() error {
+
+	_, err := makeRequest("https://api.spotify.com/v1/me/player/next", "POST")
+	if err != nil {
+		return err
+	} else {
+		return nil
+	}
 }
 
-func SearchForSong(searchString string) Song {
+
+func SearchForSong(searchString string) (Song, error) {
 
 	searchString = url.QueryEscape(searchString)
 	targetURL := fmt.Sprintf("https://api.spotify.com/v1/search?q=%s&type=track&limit=1", searchString)
-	body := makeRequest(targetURL, "GET")
+	body, err := makeRequest(targetURL, "GET")
+	if err != nil {
+		return Song{}, err
+	}
 
 	song := Song {
 		trackName: 		gjson.Get(body, "tracks.items.0.name").String(),
@@ -107,5 +124,5 @@ func SearchForSong(searchString string) Song {
 		uri:			gjson.Get(body, "tracks.items.0.uri").String(),
 	}
 
-	return song
+	return song, nil
 }

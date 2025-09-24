@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"time"
+	"math/rand"
 
 	"github.com/gin-gonic/gin"
 )
@@ -20,23 +21,44 @@ func main() {
 
 func demo() {
 
+	recommendAmount := 5
+	maxIndex := recommendAmount - 1
+
 	InitSpotify()
-	playbackState := GetPlaybackState()
+
+	playbackState, err := GetPlaybackState()
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
 	fmt.Println("Player state: ", playbackState)
 
 	song := playbackState.song
 
-	recommendedSongs := RecommendSongs(song, 5)
+	recommendedSongs, err := RecommendSongs(song, recommendAmount)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
 	fmt.Println("Recommended songs: ", recommendedSongs)
 
-	aiRecommendedSongs := AIRecommendSongs(song, 5)
-	fmt.Println("Recommended songs with LLM: ", aiRecommendedSongs)
+	aiRecommendedSongs, err := AIRecommendSongs(song, recommendAmount)
+	if err != nil {
+		fmt.Println(err)
+	} else {
+		fmt.Println("Recommended songs with LLM: ", aiRecommendedSongs)
+	}
 
-	songs := recommendedSongs.Songs
-	randomSong := songs[0]
+	songs := recommendedSongs.songs
+	random := rand.Intn(maxIndex)
+	randomSong := songs[random]
 
-	AddSongToQueue(randomSong)
-	fmt.Println("Song added to queue:", randomSong)
+	err = AddSongToQueue(randomSong)
+	if err != nil {
+		fmt.Println(err)
+	} else {
+		fmt.Println("Song added to queue:", randomSong)
+	}
 
 	time.Sleep(5 * time.Second)
 
