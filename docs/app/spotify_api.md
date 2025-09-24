@@ -2,7 +2,7 @@
 
 ## Prerequisites
 
-1. For inserting songs into queue - Spotify Premium:\
+1. For inserting songs into queue - Spotify Premium:
 - Create new email
 - Open private window in your browser
 - Get a month of free spotify
@@ -33,17 +33,17 @@ func GetPlaybackState() PlaybackState { ... }
 Returns a PlaybackState struct witch contains the following information:
 ```go
 type PlaybackState struct {
-	song 			Song		//Song struct below
-	playbackState 	string		// (true|false) is the song playing?
-	progress 		int64		//leftover song time in ms
+	song            Song		//Song struct below
+	playbackState   string		// (true|false) is the song playing?
+	progress        int64		//leftover song time in ms
 }
 // Playback contains struct song:
 type Song struct {
-	trackName		string	// Name of the track
-	trackId			string	// SpotifyID of the track
-	artistName 	string	// Artist name
-	artistId 		string	// SpotifyID of the artist
-	uri				string	// uri used when telling spotify what song to play
+	trackName   string	// Name of the track
+	trackId     string	// SpotifyID of the track
+	artistName  string	// Artist name
+	artistId    string	// SpotifyID of the artist
+	uri         string	// uri used when telling spotify what song to play
 }
 ```
 Also the following (self-explanatory) functions can be called:
@@ -69,7 +69,7 @@ In order to handle the logic of recommending a song based on the actual playing 
 The following function is available to call:
 
 ```go
-func RecommendSongs(song Song, amount int) RecommendedSongs { ...}
+func RecommendSongs(song Song, amount int) RecommendedSongs { ... }
 ```
 
 which returns a struct of possible songs to play (5 in total):
