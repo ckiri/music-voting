@@ -15,13 +15,11 @@
 
 ## Initialising and Auth (spotify_auth.go)
 
-On start of the application, the function ```InitSpotify()``` **must** be called. This function ensures that the ```token.json``` file contains a valid bearer token. If this is the first time the app is started, you will need to copy the content in the stdout into your browser and authenticate to Spotify.
+On start of the application, the function ```InitSpotify()``` **must** be called. This function ensures that the ```token.json``` file contains a valid bearer token. If this is the first time the app is started, you will need to copy the content in the stdout into your browser and authenticate to Spotify. If any error happens in ```InitSpotify()``` which leads to the token not being valid, the program crashes.
 
 ### Bugs / TODOs
-  - App crashes (sometimes ?) after the first auth
-  - Sometimes the refresh works but the function thereafter still uses the old key - after a restart the code works again
   - Port of callback can overlap with the gin web deployment
-  - The import of the .env file is relative and this should not be
+  - Environment variable handling (e.g. ```loadEnv()```) should be development only and not called always. In deployment these values can be setup in Docker and the code should only check if the values are present, not read a .env file
 
 ## Spotify API (spotify_api.go)
 

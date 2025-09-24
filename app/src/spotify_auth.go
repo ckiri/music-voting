@@ -29,19 +29,28 @@ const (
 )
 
 func loadEnv() {
-	/*
-	 * This function loads the .env file. TODO: Find a better way to reference the file
-	 */
+
 	err := godotenv.Load("../env/.env")
 	if err != nil {
 		log.Fatalf("Error loading .env file: %v", err)
 	}
+
+	required := []string{
+			"SPOTIFY_CLIENT_ID",
+			"SPOTIFY_CLIENT_SECRET",
+			"SPOTIFY_REDIRECT_URI",
+			"LAST_FM_API_KEY",
+		}
+
+		for _, key := range required {
+			if value := os.Getenv(key); value == "" {
+				log.Fatalf("Missing required environment variable: %s", key)
+			}
+		}
 }
 
 func initSpotifyAuth() {
-	/*
-	 * Initialises the object used for creating a token
-	 */
+
 	spotifyAuth = &oauth2.Config{
 		ClientID:     os.Getenv("SPOTIFY_CLIENT_ID"),
 		ClientSecret: os.Getenv("SPOTIFY_CLIENT_SECRET"),
@@ -55,9 +64,7 @@ func initSpotifyAuth() {
 }
 
 func getAuthURL() string {
-	/*
-	 * Returns the auth url needed for authenticating the user
-	 */
+
 	return spotifyAuth.AuthCodeURL("state-token", oauth2.AccessTypeOffline)
 }
 
@@ -101,6 +108,7 @@ func ReadToken(path string) (*oauth2.Token, error) {
 func InitSpotify() {
 	/*
 	 * This func ensures that the token.json file always has a valid token defined
+	 * No error handling, if an error happens the program quits
 	 */
 
 	// Initialise the structures
@@ -116,12 +124,13 @@ func InitSpotify() {
 		fmt.Printf("Expired Token was found, refreshing...")
 		refreshToken := token.RefreshToken
 		newToken, err := refreshTokenWithRefreshToken(refreshToken)
-		if err == nil {
+		if err != nil {
+			log.Fatalf("Error refreshing token: %v\n", err)
+		} else {
 			saveToken(TokenFile, newToken)
 			token = newToken
 			return
 		}
-		fmt.Printf("Error refreshing token: %v\n", err)
 	}
 
 	tokenChan := make(chan *oauth2.Token)
