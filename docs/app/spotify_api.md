@@ -88,7 +88,7 @@ Same logic, just worse (performance / latency / hallucinations). You also need a
 
 ## Error handling
 
-All public facing functions witch **can** fail return a ```error```-type object. This should be checked after calling the function. The error object can be printed out to get more information like a stacktrace.
+All public facing functions which **can** fail return a ```error```-type object. This should be checked after calling the function. The error object can be printed out to get more information like a stacktrace.
 
 ## Docs
 

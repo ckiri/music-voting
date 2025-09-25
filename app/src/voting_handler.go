@@ -59,6 +59,7 @@ func (songsToVoteFor *VoteTally) Count(songID string) int {
 	return 0
 }
 
+
 func (songsToVoteFor *VoteTally) DetermineWinner() Song {
 
 	songsToVoteFor.mu.Lock()
