@@ -15,27 +15,25 @@
 
 ## Initialising and Auth (spotify_auth.go)
 
-On start of the application, the function ```InitSpotify()``` **must** be called. This function ensures that the ```token.json``` file contains a valid bearer token. If this is the first time the app is started, you will need to copy the content in the stdout into your browser and authenticate to Spotify.
+On start of the application, the function ```InitSpotify()``` **must** be called. This function ensures that the ```token.json``` file contains a valid bearer token. If this is the first time the app is started, you will need to copy the content in the stdout into your browser and authenticate to Spotify. If any error happens in ```InitSpotify()``` which leads to the token not being valid, the program crashes.
 
-### Bugs / TODOs:
-  - App crashes (sometimes ?) after the first auth
-  - Sometimes the refresh works but the function thereafter still uses the old key - after a restart the code works again
+### Bugs / TODOs
   - Port of callback can overlap with the gin web deployment
-  - The import of the .env file is relative and this should not be
+  - Environment variable handling (e.g. ```loadEnv()```) should be development only and not called always. In deployment these values can be setup in Docker and the code should only check if the values are present, not read a .env file
 
 ## Spotify API (spotify_api.go)
 
 Once ```InitSpotify()``` has been called, the following functions are given to the user:
 
 ```go
-func GetPlaybackState() PlaybackState { ... }
+func GetPlaybackState() (PlaybackState, error) { ... }
 ```
 Returns a PlaybackState struct witch contains the following information:
 ```go
 type PlaybackState struct {
-	song            Song		//Song struct below
+	song            Song		// Song struct below
 	playbackState   string		// (true|false) is the song playing?
-	progress        int64		//leftover song time in ms
+	progress        int64		// leftover song time in ms
 }
 // Playback contains struct song:
 type Song struct {
@@ -48,18 +46,16 @@ type Song struct {
 ```
 Also the following (self-explanatory) functions can be called:
 ```go
-func AddSongToQueue(song Song) { ... }
+func AddSongToQueue(song Song) error { ... }
 ```
 ```go
-func SkipCurrentSong() { ... }
+func SkipCurrentSong() error { ... }
 ```
 ```go
-func SearchForSong(searchString string) Song { ... }
+func SearchForSong(searchString string) (Song, error) { ... }
 ```
 
-### Bugs / TODOs:
-- No error handling whatsoever -> unexpected behaviour when a API call inevitably fails
-- Could simplify the function parameters to always accept Song structs and handle value extraction in code
+### Bugs / TODOs
 - More information could be collected, like album, other artists ...
 
 ## Recommending functions (recommender.go)
@@ -69,7 +65,7 @@ In order to handle the logic of recommending a song based on the actual playing 
 The following function is available to call:
 
 ```go
-func RecommendSongs(song Song, amount int) RecommendedSongs { ... }
+func RecommendSongs(song Song, amount int) (RecommendedSongs, error) { ... }
 ```
 
 which returns a struct of possible songs to play (5 in total):
@@ -82,14 +78,17 @@ type RecommendedSongs struct {
 Alternatively the following ✨**AI Powered**✨ function is made available:
 
 ```go
-func AIRecommendSongs(song Song, amount int) RecommendedSongs { ... }
+func AIRecommendSongs(song Song, amount int) (RecommendedSongs, error) { ... }
 ```
 
 Same logic, just worse (performance / latency / hallucinations). You also need a local OLLAMA Instance running as well as a comprehensive model that does not hallucinate songs into existence.
 
-### Bugs / TODOs:
-- No error handling whatsoever -> unexpected behaviour when a API call inevitably fails
+### Bugs / TODOs
 - More choices for caller (e.g. context size, proompting, genre limits etc.)
+
+## Error handling
+
+All public facing functions witch **can** fail return a ```error```-type object. This should be checked after calling the function. The error object can be printed out to get more information like a stacktrace.
 
 ## Docs
 

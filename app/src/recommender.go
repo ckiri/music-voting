@@ -1,93 +1,96 @@
 package main
 
 import (
+	"bytes"
+	"encoding/json"
 	"fmt"
-	"os"
+	"io"
 	"net/http"
 	"net/url"
-	"io"
-	"encoding/json"
-	"bytes"
+	"os"
 
 	"github.com/tidwall/gjson"
 )
 
-func standardRequest(targetURL string) []byte {
+
+type RecommendedSongs struct {
+	songs []Song
+}
+
+
+func standardRequest(targetURL string) ([]byte, error) {
 
 	request, err := http.NewRequest("GET", targetURL, nil)
 	if err != nil {
 		fmt.Println("Failed creating a request:", err)
+		return nil, err
 	}
 
 	client := &http.Client{}
 	response, err := client.Do(request)
 	if err != nil {
 		fmt.Println("Failed making request:", err)
+		return nil, err
 	}
 	defer response.Body.Close()
 
 	body, err := io.ReadAll(response.Body)
 	if err != nil {
 		fmt.Println("Failed reading body:", err)
+		return nil, err
 	}
 
-	fmt.Println("Status:", response.Status)
-	return body
-}
-
-type RecommendedSongs struct {
-	Songs []Song
+	fmt.Println("Request: ", targetURL, " Response: ", response.Status)
+	return body, nil
 }
 
 
-func RecommendSongs(song Song, amount int) RecommendedSongs {
-	/*
-	* Gets a song and artist running rn
-	* Searches lastfm with the name and gets 5 songs back
-	* Searches for these songs on spotify
-	* TODO: Abstract the query
-    */
+func RecommendSongs(song Song, amount int) (RecommendedSongs, error) {
 
-    songName := song.trackName
-    artistName := song.artistName
-    apiKey := os.Getenv("LAST_FM_API_KEY")
     queryURL := "https://ws.audioscrobbler.com/2.0/"
+    method := "track.getsimilar"
+    artistName := song.artistName
+    songName := song.trackName
+    apiKey := os.Getenv("LAST_FM_API_KEY")
+    format := "json"
     limit := fmt.Sprintf("%d", amount)
 
     u, _ := url.Parse(queryURL)
 	q := u.Query()
-	q.Set("method", "track.getsimilar")
+	q.Set("method", method)
 	q.Set("artist", artistName)
 	q.Set("track", songName)
 	q.Set("api_key", apiKey)
-	q.Set("format", "json")
+	q.Set("format", format)
 	q.Set("limit", limit)
 	u.RawQuery = q.Encode()
 
-	recommended := RecommendedSongs{}
+	body, err := standardRequest(u.String())
+	if err != nil {
+		return RecommendedSongs{}, fmt.Errorf("Failed recommending song due to error: %s", err)
+	}
 
-	body := standardRequest(u.String())
+	recommended := RecommendedSongs{}
 
 	gjson.GetBytes(body, "similartracks.track").ForEach(func(_, value gjson.Result) bool {
         trackName := value.Get("name").String()
         artistName := value.Get("artist.name").String()
         searchString := fmt.Sprintf("%s %s", artistName, trackName)
 
-        spotifySong := SearchForSong(searchString)
-        recommended.Songs = append(recommended.Songs, spotifySong)
+        spotifySong, err := SearchForSong(searchString)
+        if err != nil {
+        	fmt.Println(err)
+        	return true
+        }
+        recommended.songs = append(recommended.songs, spotifySong)
         return true
     })
 
-    return recommended
+    return recommended, nil
 
 }
 
-func AIRecommendSongs(song Song, amount int) RecommendedSongs {
-	/*
-	* Gets a song and artist running rn
-	* Asks an LLM for 5 song / artist combos
-	* Searches for these songs on spotify
-    */
+func AIRecommendSongs(song Song, amount int) (RecommendedSongs, error) {
 
     ollamaIP := os.Getenv("OLLAMA_IP")
     model := os.Getenv("OLLAMA_MODEL")
@@ -102,32 +105,35 @@ func AIRecommendSongs(song Song, amount int) RecommendedSongs {
         ...
       ]
     }`, song.trackName, song.artistName, limit)
-    fmt.Println(prompt)
+
     payload := map[string]any{
         "model": model,
         "prompt": prompt,
         "max_tokens": 10000,
     }
     payloadBytes, _ := json.Marshal(payload)
-    url := fmt.Sprintf("%s/v1/completions", ollamaIP)
 
-    req, _ := http.NewRequest("POST", url, bytes.NewBuffer(payloadBytes))
-    req.Header.Set("Content-Type", "application/json")
+    ollamaURL := fmt.Sprintf("%s/v1/completions", ollamaIP)
+
+    request, err := http.NewRequest("POST", ollamaURL, bytes.NewBuffer(payloadBytes))
+    if err != nil {
+    	return RecommendedSongs{}, fmt.Errorf("Error creating request for Ollama: %s", err)
+    }
+    request.Header.Set("Content-Type", "application/json")
 
     client := &http.Client{}
-    resp, err := client.Do(req)
+    response, err := client.Do(request)
     if err != nil {
-        fmt.Printf("failed calling Ollama: %v", err)
-        return RecommendedSongs{}
+        return RecommendedSongs{}, fmt.Errorf("Failed calling Ollama: %s", err)
     }
-    defer resp.Body.Close()
+    defer response.Body.Close()
 
-    body, _ := io.ReadAll(resp.Body)
-
-    fmt.Println(string(body))
+    body, err := io.ReadAll(response.Body)
+    if err != nil {
+    	return RecommendedSongs{}, fmt.Errorf("Failed reading body of Ollama response: %s", err)
+    }
 
     llmOutput := gjson.GetBytes(body, "choices.0.text").String()
-    fmt.Println(llmOutput)
 
     recommended := RecommendedSongs{}
 
@@ -136,10 +142,14 @@ func AIRecommendSongs(song Song, amount int) RecommendedSongs {
         artistName := value.Get("artistName").String()
         searchString := fmt.Sprintf("%s %s", artistName, trackName)
 
-        spotifySong := SearchForSong(searchString)
-        recommended.Songs = append(recommended.Songs, spotifySong)
+        spotifySong, err := SearchForSong(searchString)
+        if err != nil {
+        	fmt.Println(err)
+        	return true
+        }
+        recommended.songs = append(recommended.songs, spotifySong)
         return true
     })
 
-    return recommended
+    return recommended, nil
 }
