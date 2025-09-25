@@ -58,3 +58,22 @@ func (songsToVoteFor *VoteTally) Count(songID string) int {
 	}
 	return 0
 }
+
+func (songsToVoteFor *VoteTally) DetermineWinner() Song {
+
+	songsToVoteFor.mu.Lock()
+	defer songsToVoteFor.mu.Unlock()
+
+	var topSong *Song
+	maxVotes := -1
+
+	for _, songWithVotes := range songsToVoteFor.songs {
+		voteCount := len(songWithVotes.votes)
+		if voteCount > maxVotes {
+			maxVotes = voteCount
+			topSong = &songWithVotes.song
+		}
+	}
+
+	return *topSong
+}

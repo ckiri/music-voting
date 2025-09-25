@@ -96,4 +96,16 @@ func demoVoteTallying() {
 		fmt.Printf("%s has %d votes\n", song.trackName, votingSession.Count(song.trackId))
 	}
 
+	topVotedSong := votingSession.DetermineWinner()
+
+	err = AddSongToQueue(topVotedSong)
+	if err != nil {
+		fmt.Println(err)
+	} else {
+		fmt.Println("Song added to queue:", topVotedSong)
+	}
+
+	time.Sleep(5 * time.Second)
+
+	SkipCurrentSong()
 }
