@@ -42,6 +42,7 @@ type Song struct {
 	artistName  string	// Artist name
 	artistId    string	// SpotifyID of the artist
 	uri         string	// uri used when telling spotify what song to play
+	image_url	  string  // A url directly to spotify cdn hosting the image of the songs album
 }
 ```
 Also the following (self-explanatory) functions can be called:
