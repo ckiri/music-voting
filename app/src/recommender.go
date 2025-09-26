@@ -73,7 +73,9 @@ func RecommendSongs(song Song, amount int) (RecommendedSongs, error) {
 
 	recommended := RecommendedSongs{}
 
-	fmt.Printf("Body of LastFM response: %s", body)
+	if string(body) == "" {
+		return recommended, fmt.Errorf("Failed reading LastFm, either the service is down or the song is too niche.")
+	}
 
 	gjson.GetBytes(body, "similartracks.track").ForEach(func(_, value gjson.Result) bool {
         trackName := value.Get("name").String()
