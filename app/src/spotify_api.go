@@ -16,6 +16,7 @@ type Song struct {
 	artistName 	string
 	artistId 	string
 	uri			string
+	image_url	string
 }
 
 
@@ -70,6 +71,7 @@ func GetPlaybackState() (PlaybackState, error) {
 		artistName: 	gjson.Get(body, "item.artists.0.name").String(),
 		artistId: 		gjson.Get(body, "item.artists.0.id").String(),
 		uri:			gjson.Get(body, "item.uri").String(),
+		image_url:		gjson.Get(body, "item.album.images.0.url").String(),
 	}
 
 	playbackState := PlaybackState{
@@ -122,6 +124,7 @@ func SearchForSong(searchString string) (Song, error) {
 		artistName: 	gjson.Get(body, "tracks.items.0.artists.0.name").String(),
 		artistId: 		gjson.Get(body, "tracks.items.0.artists.0.id").String(),
 		uri:			gjson.Get(body, "tracks.items.0.uri").String(),
+		image_url: 		gjson.Get(body, "tracks.items.0.album.images.0.url").String(),
 	}
 
 	return song, nil

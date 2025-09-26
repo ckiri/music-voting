@@ -63,6 +63,7 @@ func RecommendSongs(song Song, amount int) (RecommendedSongs, error) {
 	q.Set("api_key", apiKey)
 	q.Set("format", format)
 	q.Set("limit", limit)
+	q.Set("autocorrect", "1")
 	u.RawQuery = q.Encode()
 
 	body, err := standardRequest(u.String())
@@ -71,6 +72,8 @@ func RecommendSongs(song Song, amount int) (RecommendedSongs, error) {
 	}
 
 	recommended := RecommendedSongs{}
+
+	fmt.Printf("Body of LastFM response: %s", body)
 
 	gjson.GetBytes(body, "similartracks.track").ForEach(func(_, value gjson.Result) bool {
         trackName := value.Get("name").String()
