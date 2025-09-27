@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{{ .Title }}</title>
+  <link rel="stylesheet" href="/static/css/style.css">
+  <script src="/static/js/app.js" defer></script>
+</head>
+<body>
+  <h1>Vote for the next Song!</h1>
+  <div class="song-queue">
+
+    <div class="song">
+      <div class="song-cover">
+        <img src="https://image-cdn-ak.spotifycdn.com/image/ab67616d00001e0279e3ea176595838c3770e05d">
+      </div>
+      <div class="song-meta">
+        <span class="song-title">Ordinary - Lake People's Circle Motive Remix</span>
+        <span class="song-artist">Kollektiv Turmstrasse</span>
+        <span class="song-votes">Votes: <span id="box1">{{ index . "box1" }}</span></span>
+      </div>
+      <div class="vote-section">
+        <button class="vote-button" onclick="vote('box1')">+</button>
+      </div>
+    </div>
+
+    <div class="song">
+      <div class="song-cover">
+        <img src="https://image-cdn-fa.spotifycdn.com/image/ab67616d00001e028deec279b07d5a628aca1ea3">
+      </div>
+      <div class="song-meta">
+        <span class="song-title">Sea Gets Hotter</span>
+        <span class="song-artist">Durand Jones & The Indications, Durand Jones, Aaron Frazer</span>
+        <span class="song-votes">Votes: <span id="box2">{{ index . "box2" }}</span></span>
+      </div>
+      <div class="vote-section">
+        <button class="vote-button" onclick="vote('box2')">+</button>
+      </div>
+    </div>
+
+    <div class="song">
+      <div class="song-cover">
+        <img src="https://image-cdn-ak.spotifycdn.com/image/ab67616d00001e02799cf48c9e6300054dac9467">
+      </div>
+      <div class="song-meta">
+        <span class="song-title">What You Wanna Try</span>
+        <span class="song-artist">Masego</span>
+        <span class="song-votes">Votes: <span id="box3">{{ index . "box3" }}</span></span>
+      </div>
+      <div class="vote-section">
+        <button class="vote-button" onclick="vote('box3')">+</button>
+      </div>
+    </div>
+
+  </div>
+</body>
+</html>
