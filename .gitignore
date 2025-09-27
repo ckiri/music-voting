@@ -33,3 +33,6 @@ go.work.sum
 
 # Token file
 token.json
+
+# Ctags
+tags
