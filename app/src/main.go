@@ -90,7 +90,10 @@ func demoVoteTallying() {
 	votingSession :=  initVotes(recommendedSongs)
 	votingSession.Add(recommendedSongs.songs[0].trackId, "user-1")
 	votingSession.Add(recommendedSongs.songs[0].trackId, "user-2")
-	votingSession.Add(recommendedSongs.songs[0].trackId, "user-3")
+	votingSession.Add(recommendedSongs.songs[1].trackId, "user-3")
+	votingSession.Add(recommendedSongs.songs[1].trackId, "user-4")
+	votingSession.Add(recommendedSongs.songs[2].trackId, "user-5")
+	votingSession.Add(recommendedSongs.songs[2].trackId, "user-6")
 
 	for _, song := range recommendedSongs.songs {
 		fmt.Printf("%s has %d votes\n", song.trackName, votingSession.Count(song.trackId))
