@@ -23,7 +23,9 @@ type Song struct {
 type PlaybackState struct {
 	song 			Song
 	playbackState 	string
-	progress 		int64
+	remainingLength int64
+	totalLength     int64
+	timestamp       int64
 }
 
 
@@ -77,7 +79,9 @@ func GetPlaybackState() (PlaybackState, error) {
 	playbackState := PlaybackState{
 		song:			song,
 		playbackState: 	gjson.Get(body, "is_playing").String(),
-		progress: 		timeLeftMs,
+		remainingLength:timeLeftMs,
+		totalLength:    durationMs,
+		timestamp: 		progressMs,
 	}
 
 	return playbackState, nil
