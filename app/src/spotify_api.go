@@ -46,12 +46,15 @@ func makeRequest(targetURL string, requestType string) (string, error) {
 	}
 	defer response.Body.Close()
 
+	if response.StatusCode != http.StatusOK {
+		return "", fmt.Errorf("Unexpected status code: %d %s", response.StatusCode, response.Status)
+	}
+
 	body, err := io.ReadAll(response.Body)
 	if err != nil {
 		return "", fmt.Errorf("Failed reading body: %s", err)
 	}
 
-	fmt.Println("Status: ", response.Status)
 	return string(body), nil
 }
 
