@@ -41,12 +41,10 @@ func (songsToVoteFor *VoteTally) Count(songID string) int { ... }
 ```
 
 `.DetermineWinner()` can be called to return a song object which has the most amount of votes:
-**Note:** This does not (yet) handle the case where two songs have the same amount of votes -> in this case the first one found with the highes amount is returned
 ```go
 func (songsToVoteFor *VoteTally) DetermineWinner() Song { ... }
 ```
 
 ## Bugs/ToDo:
-- Handle multiple songs with same amount of votes
 - Make decision on how users are identified in the programm and apply this to userId related functions
 - Handle empty recommendation list (?)

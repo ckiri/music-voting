@@ -32,8 +32,10 @@ Returns a PlaybackState struct witch contains the following information:
 ```go
 type PlaybackState struct {
 	song            Song		// Song struct below
-	playbackState   string		// (true|false) is the song playing?
-	progress        int64		// leftover song time in ms
+	playbackState   string  // Is the song playing? (true|false) in String form (not bool!)
+	remainingLength int64		// Remaining song time in ms -> Calculated from totalLength - timestamp
+	totalLength     int64   // How long the song is in ms
+	timestamp       int64   // The timestamp the song is at
 }
 // Playback contains struct song:
 type Song struct {
@@ -42,6 +44,7 @@ type Song struct {
 	artistName  string	// Artist name
 	artistId    string	// SpotifyID of the artist
 	uri         string	// uri used when telling spotify what song to play
+	image_url	  string  // A url directly to spotify cdn hosting the image of the songs album
 }
 ```
 Also the following (self-explanatory) functions can be called:

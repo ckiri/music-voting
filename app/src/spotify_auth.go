@@ -28,9 +28,9 @@ const (
 	TokenFile = "token.json"
 )
 
-func loadEnv() {
+func loadEnv(path string) {
 
-	err := godotenv.Load("../env/.env")
+	err := godotenv.Load(path)
 	if err != nil {
 		log.Fatalf("Error loading .env file: %v", err)
 	}
@@ -112,7 +112,8 @@ func InitSpotify() {
 	 */
 
 	// Initialise the structures
-	loadEnv()
+	pathToEnvFile := "../env/.env"
+	loadEnv(pathToEnvFile)
 	initSpotifyAuth()
 
 	// Try to read the token, check if valid and refresh if possible

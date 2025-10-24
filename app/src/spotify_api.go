@@ -16,13 +16,16 @@ type Song struct {
 	artistName 	string
 	artistId 	string
 	uri			string
+	image_url	string
 }
 
 
 type PlaybackState struct {
 	song 			Song
 	playbackState 	string
-	progress 		int64
+	remainingLength int64
+	totalLength     int64
+	timestamp       int64
 }
 
 
@@ -43,12 +46,15 @@ func makeRequest(targetURL string, requestType string) (string, error) {
 	}
 	defer response.Body.Close()
 
+	if response.StatusCode != http.StatusOK {
+		return "", fmt.Errorf("Unexpected status code: %d %s", response.StatusCode, response.Status)
+	}
+
 	body, err := io.ReadAll(response.Body)
 	if err != nil {
 		return "", fmt.Errorf("Failed reading body: %s", err)
 	}
 
-	fmt.Println("Status: ", response.Status)
 	return string(body), nil
 }
 
@@ -70,12 +76,15 @@ func GetPlaybackState() (PlaybackState, error) {
 		artistName: 	gjson.Get(body, "item.artists.0.name").String(),
 		artistId: 		gjson.Get(body, "item.artists.0.id").String(),
 		uri:			gjson.Get(body, "item.uri").String(),
+		image_url:		gjson.Get(body, "item.album.images.0.url").String(),
 	}
 
 	playbackState := PlaybackState{
 		song:			song,
 		playbackState: 	gjson.Get(body, "is_playing").String(),
-		progress: 		timeLeftMs,
+		remainingLength:timeLeftMs,
+		totalLength:    durationMs,
+		timestamp: 		progressMs,
 	}
 
 	return playbackState, nil
@@ -122,6 +131,7 @@ func SearchForSong(searchString string) (Song, error) {
 		artistName: 	gjson.Get(body, "tracks.items.0.artists.0.name").String(),
 		artistId: 		gjson.Get(body, "tracks.items.0.artists.0.id").String(),
 		uri:			gjson.Get(body, "tracks.items.0.uri").String(),
+		image_url: 		gjson.Get(body, "tracks.items.0.album.images.0.url").String(),
 	}
 
 	return song, nil

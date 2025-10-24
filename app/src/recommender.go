@@ -63,6 +63,7 @@ func RecommendSongs(song Song, amount int) (RecommendedSongs, error) {
 	q.Set("api_key", apiKey)
 	q.Set("format", format)
 	q.Set("limit", limit)
+	q.Set("autocorrect", "1")
 	u.RawQuery = q.Encode()
 
 	body, err := standardRequest(u.String())
@@ -71,6 +72,10 @@ func RecommendSongs(song Song, amount int) (RecommendedSongs, error) {
 	}
 
 	recommended := RecommendedSongs{}
+
+	if string(body) == "" {
+		return recommended, fmt.Errorf("Failed reading LastFm, either the service is down or the song is too niche.")
+	}
 
 	gjson.GetBytes(body, "similartracks.track").ForEach(func(_, value gjson.Result) bool {
         trackName := value.Get("name").String()

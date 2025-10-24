@@ -2,6 +2,7 @@ package main
 
 import (
 	"sync"
+	"math/rand"
 )
 
 
@@ -65,16 +66,29 @@ func (songsToVoteFor *VoteTally) DetermineWinner() Song {
 	songsToVoteFor.mu.Lock()
 	defer songsToVoteFor.mu.Unlock()
 
-	var topSong *Song
+	var topSongs []*Song
 	maxVotes := -1
 
 	for _, songWithVotes := range songsToVoteFor.songs {
 		voteCount := len(songWithVotes.votes)
+
 		if voteCount > maxVotes {
 			maxVotes = voteCount
-			topSong = &songWithVotes.song
+			topSongs = []*Song{&songWithVotes.song}
+		} else if voteCount == maxVotes {
+			topSongs = append(topSongs, &songWithVotes.song)
 		}
 	}
 
-	return *topSong
+	maxIndex := len(topSongs) - 1
+
+	if maxIndex == 0 {
+		topSong := topSongs[0]
+		return *topSong
+	} else {
+		randomIndex := rand.Intn(maxIndex)
+		randomTopSong := topSongs[randomIndex]
+		return *randomTopSong
+	}
+
 }
